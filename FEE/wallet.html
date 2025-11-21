@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet | NodeLoom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="logo">NodeLoom</h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="wallet.html">Wallet</a>
+                <a href="send.html">Send</a>
+                <a href="receive.html">Receive</a>
+                <a href="support.html">Support</a>
+            </nav>
+            <a href="signin.html" class="btn-signin">Account</a>
+        </header>
+        <main>
+            <div class="content">
+                <h1>Your Wallet</h1>
+                <p class="description">View your balances and manage your assets securely.</p>
+                <section class="wallet-section">
+                    <div class="wallet-card">
+                        <div class="wallet-toolbar">
+                            <button id="wallet-refresh-all" class="btn-get-started btn-small" aria-label="Refresh All">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="22" height="22" style="vertical-align:middle;"><path d="M552 256L408 256C398.3 256 389.5 250.2 385.8 241.2C382.1 232.2 384.1 221.9 391 215L437.7 168.3C362.4 109.7 253.4 115 184.2 184.2C109.2 259.2 109.2 380.7 184.2 455.7C259.2 530.7 380.7 530.7 455.7 455.7C463.9 447.5 471.2 438.8 477.6 429.6C487.7 415.1 507.7 411.6 522.2 421.7C536.7 431.8 540.2 451.8 530.1 466.3C521.6 478.5 511.9 490.1 501 501C401 601 238.9 601 139 501C39.1 401 39 239 139 139C233.3 44.7 382.7 39.4 483.3 122.8L535 71C541.9 64.1 552.2 62.1 561.2 65.8C570.2 69.5 576 78.3 576 88L576 232C576 245.3 565.3 256 552 256z"/></svg>
+                            </button>
+                        </div>
+                        <table class="wallet-table">
+                            <thead>
+                                <tr>
+                                    <th class="wallet-col-asset">Cryptocurrency</th>
+                                    <th class="wallet-col-balance">Balance</th>
+                                    <th class="wallet-col-value">Value (USD)</th>
+                                    <th class="wallet-col-pl">24h P/L</th>
+                                    <th class="wallet-col-address">Address</th>
+                                    <th class="wallet-col-actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wallet-tbody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script>
+    (function () {
+        const DEFAULTS = {
+            BTC: "1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ",
+            ETH: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+            SOL: "2RH6rUTPBJ9rUDPpuV9b8z1YL56k1tYU6Uk5ZoaEFFSK",
+            DOGE: "DH5yaieqoZN36fDVciNyRueRGvGLR3sbUv"
+        };
+
+        const COIN_META = [
+            { symbol: 'BTC', name: 'Bitcoin', priceId: 'bitcoin', decimals: 8 },
+            { symbol: 'ETH', name: 'Ethereum', priceId: 'ethereum', decimals: 18 },
+            { symbol: 'SOL', name: 'Solana', priceId: 'solana', decimals: 9 },
+            { symbol: 'DOGE', name: 'Dogecoin', priceId: 'dogecoin', decimals: 8 }
+        ];
+
+        function getStoredAddress(symbol) {
+            const key = `wallet_addr_${symbol}`;
+            const stored = localStorage.getItem(key);
+            if (stored && stored.trim()) return stored.trim();
+            return DEFAULTS[symbol] || '';
+        }
+
+        function setStoredAddress(symbol, address) {
+            localStorage.setItem(`wallet_addr_${symbol}`, address);
+        }
+
+        function formatNumber(num, options) {
+            try { return new Intl.NumberFormat('en-US', options).format(num); }
+            catch (_e) { return String(num); }
+        }
+
+        async function fetchPrices() {
+            const ids = COIN_META.map(c => c.priceId).join(',');
+            const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Failed to fetch prices');
+            return res.json();
+        }
+
+        async function fetchBtcBalance(symbol, address) {
+            const res = await fetch(`https://blockstream.info/api/address/${address}`);
+            if (!res.ok) throw new Error('BTC address fetch failed');
+            const data = await res.json();
+            const funded = (data.chain_stats?.funded_txo_sum || 0);
+            const spent = (data.chain_stats?.spent_txo_sum || 0);
+            const confirmedSats = funded - spent;
+            return confirmedSats / 1e8; // BTC
+        }
+
+        async function fetchEthBalance(symbol, address) {
+            if (!address) return 0;
+            // Use Etherscan API (replace YOUR_API_KEY with a valid key)
+            const apiKey = "GZYKFSWQH4193RRECPZP8Y28KPBS9TKD8P"; // User's Etherscan API key
+            const url = `https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=latest&apikey=${apiKey}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('ETH address fetch failed');
+            const data = await res.json();
+            if (data.status !== "1" || !data.result) throw new Error('ETH address fetch failed');
+            const balanceWei = BigInt(data.result);
+            const balance = Number(balanceWei) / 1e18;
+            return balance; // ETH
+        }
+
+        async function fetchSolBalance(symbol, address) {
+            if (!address) return 0;
+            try {
+                const res = await fetch(`https://public-api.solscan.io/account/${address}`);
+                if (!res.ok) throw new Error('SOL address fetch failed');
+                const data = await res.json();
+                const lamports = typeof data?.lamports === 'number' ? data.lamports : 0;
+                return lamports / 1e9; // SOL
+            } catch (e) {
+                console.error('SOL fetch error:', e);
+                return 0;
+            }
+        }
+
+        async function fetchDogeBalance(symbol, address) {
+            if (!address) return 0;
+            try {
+                const url = `https://api.blockchair.com/dogecoin/dashboards/address/${address}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('DOGE address fetch failed');
+                const data = await res.json();
+                const entry = data?.data?.[address]?.address;
+                const balance = entry?.balance ? parseFloat(entry.balance) / 1e8 : 0;
+                return balance; // DOGE
+            } catch (e) {
+                console.error('DOGE fetch error:', e);
+                return 0;
+            }
+        }
+
+        const fetchers = {
+            BTC: fetchBtcBalance,
+            ETH: fetchEthBalance,
+            SOL: fetchSolBalance,
+            DOGE: fetchDogeBalance
+        };
+
+        function renderRows() {
+            const tbody = document.getElementById('wallet-tbody');
+            tbody.innerHTML = '';
+            COIN_META.forEach(meta => {
+                const address = getStoredAddress(meta.symbol);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="wallet-col-asset">${meta.name} (${meta.symbol})</td>
+                    <td class="wallet-col-balance" id="bal-${meta.symbol}">—</td>
+                    <td class="wallet-col-value" id="usd-${meta.symbol}">—</td>
+                    <td class="wallet-col-pl" id="pl-${meta.symbol}">—</td>
+                    <td class="wallet-col-address wallet-address"><code class="truncate" id="addr-${meta.symbol}">${address || '—'}</code></td>
+                    <td class="wallet-col-actions">
+                        <div class="wallet-actions">
+                            <a id="send-${meta.symbol}" href="send.html?currency=${meta.symbol}${address ? `&address=${address}` : ''}" class="btn-get-started btn-small">Send</a>
+                            <a id="recv-${meta.symbol}" href="receive.html?currency=${meta.symbol}${address ? `&address=${address}` : ''}" class="btn-signing-main btn-small">Receive</a>
+                            <button id="set-${meta.symbol}" class="btn-signing-main btn-small">Set Address</button>
+                            <button id="ref-${meta.symbol}" class="btn-get-started btn-small" aria-label="Refresh">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="18" height="18" style="vertical-align:middle;"><path d="M552 256L408 256C398.3 256 389.5 250.2 385.8 241.2C382.1 232.2 384.1 221.9 391 215L437.7 168.3C362.4 109.7 253.4 115 184.2 184.2C109.2 259.2 109.2 380.7 184.2 455.7C259.2 530.7 380.7 530.7 455.7 455.7C463.9 447.5 471.2 438.8 477.6 429.6C487.7 415.1 507.7 411.6 522.2 421.7C536.7 431.8 540.2 451.8 530.1 466.3C521.6 478.5 511.9 490.1 501 501C401 601 238.9 601 139 501C39.1 401 39 239 139 139C233.3 44.7 382.7 39.4 483.3 122.8L535 71C541.9 64.1 552.2 62.1 561.2 65.8C570.2 69.5 576 78.3 576 88L576 232C576 245.3 565.3 256 552 256z"/></svg>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function wireActions(prices) {
+            COIN_META.forEach(meta => {
+                const setBtn = document.getElementById(`set-${meta.symbol}`);
+                const refBtn = document.getElementById(`ref-${meta.symbol}`);
+                setBtn.addEventListener('click', () => {
+                    const current = getStoredAddress(meta.symbol);
+                    const addr = prompt(`Enter ${meta.name} address:`, current || '');
+                    if (addr === null) return;
+                    const cleaned = addr.trim();
+                    setStoredAddress(meta.symbol, cleaned);
+                    document.getElementById(`addr-${meta.symbol}`).textContent = cleaned || '—';
+                    const send = document.getElementById(`send-${meta.symbol}`);
+                    const recv = document.getElementById(`recv-${meta.symbol}`);
+                    send.href = `send.html?currency=${meta.symbol}${cleaned ? `&address=${cleaned}` : ''}`;
+                    recv.href = `receive.html?currency=${meta.symbol}${cleaned ? `&address=${cleaned}` : ''}`;
+                    refreshOne(meta, prices);
+                });
+                refBtn.addEventListener('click', () => refreshOne(meta, prices));
+            });
+        }
+
+        async function refreshOne(meta, prices) {
+            const balEl = document.getElementById(`bal-${meta.symbol}`);
+            const usdEl = document.getElementById(`usd-${meta.symbol}`);
+            const plEl = document.getElementById(`pl-${meta.symbol}`);
+            const addr = getStoredAddress(meta.symbol);
+
+            const change = prices?.[meta.priceId]?.usd_24h_change || 0;
+            const sign = change >= 0 ? '+' : '';
+            plEl.textContent = `${sign}${(change).toFixed(2)}%`;
+            plEl.style.color = change >= 0 ? '#22c55e' : '#ef4444';
+
+            if (!addr) {
+                balEl.textContent = '—';
+                usdEl.textContent = '—';
+                return;
+            }
+
+            balEl.textContent = '…';
+            usdEl.textContent = '…';
+            try {
+                const fetcher = fetchers[meta.symbol];
+                const balance = await fetcher(meta.symbol, addr);
+                const priceUsd = prices?.[meta.priceId]?.usd || 0;
+                const valueUsd = balance * priceUsd;
+                balEl.textContent = formatNumber(balance, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                usdEl.textContent = `$${formatNumber(valueUsd, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            } catch (e) {
+                console.error(`${meta.symbol} refresh failed`, e);
+                balEl.textContent = 'Error';
+                usdEl.textContent = 'Error';
+                plEl.textContent = '—';
+                plEl.style.color = '';
+            }
+        }
+
+        async function refreshAll() {
+            let prices;
+            try {
+                prices = await fetchPrices();
+            } catch (e) {
+                console.error('Price fetch failed', e);
+                prices = {};
+            }
+            wireActions(prices);
+            COIN_META.forEach(meta => refreshOne(meta, prices));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const tbody = document.getElementById('wallet-tbody');
+            if (!tbody) return;
+            renderRows();
+            refreshAll();
+            const refreshAllBtn = document.getElementById('wallet-refresh-all');
+            if (refreshAllBtn) refreshAllBtn.addEventListener('click', refreshAll);
+        });
+    })();
+    </script>
+</body>
+</html>

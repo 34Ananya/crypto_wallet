@@ -1,0 +1,441 @@
+#logo {
+    display: none !important;
+}
+/* Global Resets */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: black;
+    color: lightgray;
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+/* Gradient and Layer Blur */
+.image-gradient {
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0.5;
+    z-index: -1;
+}
+
+.layer-blur {
+    height: 0;
+    width: 30rem;
+    position: absolute;
+    top: 20%;
+    right: 0;
+    box-shadow: 0 0 5rem 5rem #5300a0;
+    rotate: -30deg;
+    z-index: -1;
+}
+
+/* Container */
+.container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+    overflow: visible;
+}
+
+/* Header and Navigation */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5rem;
+}
+
+header h1.logo {
+    margin: 0;
+    font-size: 3rem;
+    font-weight: 300;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    margin-left: -5%;
+}
+
+nav a {
+    font-size: 1rem;
+    letter-spacing: 0.1rem;
+    transition: color 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+nav a:hover {
+    color: #a7a7a7;
+}
+
+.btn-signin {
+    text-decoration: none;
+    background-color: white;
+    color: black;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-signin:hover {
+    background-color: #bcbcbc;
+}
+
+/* Main Content */
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(90vh - 6rem);
+}
+
+.main-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 60vh;
+    padding-right: 5vw;
+}
+
+.robot-3d-wrapper {
+    position: relative;
+.robot-bg-blur {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(138,43,226,0.25) 0%, rgba(0,0,0,0.0) 70%);
+    filter: blur(30px);
+}
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 45%;
+    min-width: 350px;
+    height: 600px;
+}
+#logo {
+    display: none !important;
+}
+
+.content {
+    /* max-width: 40rem; */
+    margin-left: 5%;
+}
+
+.tag-box {
+    position: relative;
+    width: 18rem;
+    height: 2.5rem;
+    border-radius: 50px;
+    background: linear-gradient(to right, #6f00ff, #c300ff, #ff0084, #00d9ff, #6f00ff);
+    background-size: 200%;
+    animation: gradientAnimation 2.5s linear infinite;
+    box-shadow: 0 0 20px 5px rgba(138, 43, 226, 0.5);
+}
+
+@keyframes gradientAnimation {
+    to {
+        background-position: 200%;
+    }
+}
+
+.tag-box .tag {
+    position: absolute;
+    inset: 3px;
+    background-color: black;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.5s ease;
+    cursor: pointer;
+}
+
+.tag-box .tag:hover {
+    color: #5300a0;
+}
+
+.content h1 {
+    font-size: 4rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    margin: 2rem 0;
+    line-height: 1.2;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.description {
+    font-size: 1.2rem;
+    letter-spacing: 0.05em;
+    max-width: 35rem;
+    color: gray;
+}
+
+/* Wallet Page */
+.wallet-section {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 60vh;
+}
+
+.wallet-card {
+    background: linear-gradient(135deg, #232323 80%, #181818 100%);
+    border: 1.5px solid #232323;
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(10,132,255,0.10), 0 1.5px 8px 0 rgba(138,43,226,0.08);
+    overflow: hidden;
+    padding: 2.5rem 2rem 2rem 2rem;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+.wallet-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 0 1.2rem 0;
+    gap: 0.5rem;
+}
+
+.wallet-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.7rem;
+    table-layout: fixed;
+}
+
+.wallet-table thead th {
+    font-size: 1rem;
+    color: #bdbdbd;
+    font-weight: 700;
+    padding: 1rem 1rem 0.7rem 1rem;
+    background: none;
+    border-bottom: 1.5px solid #232323;
+}
+
+.wallet-table tbody td {
+    padding: 1.1rem 1rem;
+    background: rgba(36,36,36,0.95);
+    border-radius: 1.2rem;
+    box-shadow: 0 2px 8px 0 rgba(10,132,255,0.04);
+    border: none;
+    vertical-align: middle;
+    transition: box-shadow 0.2s, background 0.2s;
+}
+.wallet-table tbody tr:hover td {
+    background: #232323;
+    box-shadow: 0 4px 16px 0 rgba(10,132,255,0.10);
+}
+
+
+ .wallet-col-asset { text-align: left; width: 8%; }
+ .wallet-col-balance { text-align: right; width: 10%; font-variant-numeric: tabular-nums; }
+ .wallet-col-value { text-align: right; width: 10%; font-variant-numeric: tabular-nums; }
+ .wallet-col-pl { text-align: right; width: 7%; font-variant-numeric: tabular-nums; }
+ .wallet-col-address { text-align: left; width: 8%; overflow: hidden; }
+.wallet-col-actions { text-align: right; width: 20%; }
+
+.wallet-address code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.95rem;
+    color: #e0e0e0;
+    background: rgba(255,255,255,0.06);
+    padding: 0.18rem 0.5rem;
+    border-radius: 8px;
+    letter-spacing: 0.03em;
+    display: block;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* For Webkit browsers */
+.wallet-address code::-webkit-scrollbar {
+    height: 4px;
+}
+.wallet-address code::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+.wallet-address code::-webkit-scrollbar-track {
+    background: #232323;
+}
+
+.wallet-address code.truncate {
+    display: inline-block;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wallet-actions {
+    display: inline-flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.btn-small {
+    padding: 0.28rem 0.7rem;
+    font-size: 0.85rem;
+    border-radius: 0.7rem;
+}
+
+@media screen and (max-width: 960px) {
+    .wallet-address code.truncate { max-width: 160px; }
+    .wallet-col-address { width: 28%; }
+    .wallet-col-actions { width: 26%; }
+    .btn-small { padding: 0.4rem 0.7rem; font-size: 0.85rem; }
+}
+
+.buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 3rem;
+}
+
+.btn-get-started {
+    text-decoration: none;
+    border: 1px solid #2a2a2a;
+    padding: 0.28rem 0.7rem;
+    border-radius: 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    transition: background-color 0.2s ease;
+    color: lightgray;
+}
+
+.btn-get-started:hover {
+    background-color: #1a1a1a;
+}
+
+.btn-signing-main {
+    text-decoration: none;
+    background-color: lightgray;
+    color: black;
+    padding: 0.28rem 0.7rem;
+    border-radius: 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    transition: background-color 0.2s ease;
+}
+
+.btn-signing-main:hover {
+    background-color: gray;
+}
+
+/* 3D Robot Model */
+.robot-3d {
+    width: 100%;
+    max-width: 500px;
+    min-width: 300px;
+    height: 600px;
+    background: transparent;
+    position: relative;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    
+}
+
+#logo{
+    visibility: collapse;
+}
+/* Responsive Design (Media Queries) */
+@media screen and (max-width: 1300px) {
+    header {
+        padding: 1rem 0.5rem;
+    }
+    .main-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    .robot-3d-wrapper {
+        width: 100%;
+        justify-content: center;
+        margin-top: 2rem;
+        height: 350px;
+    }
+    .robot-3d {
+        max-width: 350px;
+        height: 350px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    header {
+        padding: 1rem 0.1rem;
+    }
+    nav {
+        display: none;
+    }
+    header h1.logo {
+        font-size: 2rem;
+    }
+    .btn-signin {
+        width: auto;
+        padding: 0.6rem 1.5rem;
+    }
+    .content {
+        margin-top: 25rem;
+        max-width: 30rem;
+        margin-left: 10%;
+    }
+    .tag-box {
+        width: 12rem;
+    }
+    .content h1 {
+        font-size: 2.5rem;
+    }
+    .description {
+        font-size: 1rem;
+    }
+    .btn-get-started {
+        font-size: 0.8rem;
+        padding: 0.5rem 1.2rem;
+    }
+    .btn-signing-main {
+        font-size: 0.8rem;
+        padding: 0.5rem 2rem;
+    }
+    .main-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    .robot-3d-wrapper {
+        width: 100%;
+        justify-content: center;
+        margin-top: 2rem;
+        height: 220px;
+    }
+    .robot-3d {
+        max-width: 250px;
+        height: 220px;
+    }
+}
